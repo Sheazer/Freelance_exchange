@@ -1,0 +1,18 @@
+{% extends "mysite/base.html" %}
+
+{% block title %}Список заданий{% endblock %}
+
+
+{% block content %}
+
+<h1>list of tasks</h1>
+{% for task in tasks %}
+<a href="{% url 'mysite:detail_task' task.id %}"><h2>{{ task.title }}</h2></a>
+<p>{{ task.description }}</p>
+<p>{{ task.price }}</p>
+<p>{{ task.deadline }}</p>
+<p>----------------------</p>
+ {% empty %}
+        <p>У вас пока нет задач.</p>
+{% endfor %}
+{% endblock %}

@@ -1,15 +1,13 @@
 from django.contrib import admin
 
-from .models import CustomUser, Customer, Executor
+from .models import CustomUser, ExecutorPortfolio, Category, Task
 
 admin.site.register(CustomUser)
 
-
-@admin.register(Customer)
-class CustomerAdmin(admin.ModelAdmin):
-    list_display = ['username', 'email', 'role']
+admin.site.register(Category)
+admin.site.register(Task)
 
 
-@admin.register(Executor)
-class ExecutorAdmin(admin.ModelAdmin):
-    list_display = ['username', 'email', 'role']
+@admin.register(ExecutorPortfolio)
+class Profile(admin.ModelAdmin):
+    list_display = ['user', 'rating']

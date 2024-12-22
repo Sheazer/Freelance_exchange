@@ -1,0 +1,20 @@
+{% extends "mysite/base.html" %}
+
+{% block title %}Список заданий{% endblock %}
+
+
+{% block content %}
+
+<p>----------------------</p>
+<h1>Task</h1>
+<h2>{{ task.title }}</h2>
+<p>{{ task.description }}</p>
+<p>{{ task.price }}</p>
+<p>{{ task.deadline }}</p>
+<p>{{ task.key_words }}</p>
+<p>{{ task.price }}</p>
+{% if task.categories %}
+    <p>{{ task.categories }}</p>
+{% endif %}
+<p>----------------------</p>
+{% endblock %}

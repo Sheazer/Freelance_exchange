@@ -1,15 +1,17 @@
 {% extends "mysite/base.html" %}
 
 
+
 {% block content %}
-<h2>Registration</h2>
+<h1>Login</h1>
 {% if error %}
 <h2 style="color: red;">{{ error }}</h2>
 {% endif %}
-<form action="{% url 'mysite:register' %}" method="post">
+<form action="{% url 'mysite:login' %}" method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Register">
+    <input type="submit" value="Login">
 </form>
-<p>or <a href="/login">login</a></p>
+
+<p>or <a href="/register">Register</a></p>
 {% endblock %}

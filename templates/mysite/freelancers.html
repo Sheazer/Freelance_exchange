@@ -1,0 +1,27 @@
+{% extends "mysite/base.html" %}
+
+{% block title %}Freelancers{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Список фрилансеров</h1>
+    <div class="row">
+        {% for user in users %}
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ user.username }}</h5>
+                        <p class="card-text">
+                            <strong>Имя:</strong> {{ user.first_name }} {{ user.last_name }}<br>
+                            <strong>Email:</strong> {{ user.email }}
+                        </p>
+                        <a href="{% url 'mysite:profile' user.username %}" class="btn btn-primary">Посмотреть профиль</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>Фрилансеры не найдены.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

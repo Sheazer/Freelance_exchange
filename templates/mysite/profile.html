@@ -5,9 +5,30 @@
 
 {% block content %}
 <div class="container">
-    <h1>Профиль пользователя: {{ user.username }}</h1>
+    <h1>Данные пользователя: {{ user.username }}</h1>
     <p><strong>Имя:</strong> {{ user.first_name }}</p>
     <p><strong>Фамилия:</strong> {{ user.last_name }}</p>
     <p><strong>Email:</strong> {{ user.email }}</p>
 </div>
+{% if request.user == user %}
+<a href="{% url 'mysite:edit_profile' %}" class="btn btn-primary">Редактировать</a>
+{% endif %}
+
+
+{% if profile %}
+<hr>
+<h2>Профиль исполнителя</h2>
+<p><strong>Описание:</strong> {{ profile.description }}</p>
+<p><strong>Категории:</strong>
+    {% for category in profile.categories.all %}
+    {{ category.name }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
+<p><strong>Скиллы:</strong>{{ profile.skills }}</p>
+<p><strong>Опыт работы:</strong>{{ profile.experience }}</p>
+<p><strong>Оценки:</strong>{{ profile.rating }}</p>
+{% if request.user == user %}
+<a href="{% url 'mysite:edit_portfolio' %}" class="btn btn-primary">Редактировать</a>
+{% endif %}
+{% endif %}
 {% endblock %}

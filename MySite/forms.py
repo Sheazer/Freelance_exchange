@@ -1,5 +1,5 @@
 from django import forms
-from .models import CustomUser, Task, Category
+from .models import CustomUser, Task, Category, ExecutorPortfolio
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -37,10 +37,27 @@ class TaskCreateForm(forms.ModelForm):
 class UserEditForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['username', 'last_name', 'email', 'first_name']
+        fields = ['username', 'first_name', 'last_name', 'email' ]
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'username': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+
+class EditPortfolioForm(forms.ModelForm):
+    categories = forms.ModelMultipleChoiceField(
+        queryset=Category.objects.all(),  # Все категории из базы данных
+        widget=forms.CheckboxSelectMultiple,  # Виджет для множественного выбора
+        required=False  # Поле не обязательно
+    )
+
+    class Meta:
+        model = ExecutorPortfolio
+        fields = ['categories', 'skills', 'experience', 'portfolio']
+
+
+class TaskFilterForm(forms.Form):
+    categories = forms.ModelMultipleChoiceField(queryset=Category.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
+    key_words = forms.CharField(max_length=100, required=False)

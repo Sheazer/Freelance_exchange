@@ -45,22 +45,37 @@ class ExecutorPortfolio(models.Model):
     categories = models.ManyToManyField(Category, related_name="categories_sk")
     experience = models.TextField(help_text="Description of experience or info about you", blank=True)
     portfolio = models.TextField(help_text="Portfolio or projects links", blank=True)
-    rating = models.FloatField(help_text="Average rating", default=0)
+    like = models.IntegerField(help_text="Likes rating", default=0)
+    dislike = models.IntegerField(help_text="Likes rating", default=0)
+    completed_tasks = models.IntegerField(help_text="Likes rating", default=0)
 
 
 class CustomerPortfolio(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='customer_portfolio')
 
 
-
 class Task(models.Model):
+    STATUS_CHOICES = [
+        ('active', 'Активный'),
+        ('inactive', 'Неактивный'),
+        ('in_progress', 'В работе'),
+        ('completed', 'Завершён'),
+    ]
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="tasks")
-    categories = models.ManyToManyField(Category, default="Not have categories", related_name="categories")
+    executor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="tasks_on_work", null=True)
+    categories = models.ManyToManyField(Category, default="Not have categories", related_name="task_category")
     key_words = models.CharField(max_length=50, help_text='specialization')
     title = models.CharField(max_length=100, help_text="Name of the task")
     description = models.TextField(help_text="Description of your task")
     price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price")
     deadline = models.DateTimeField(help_text="Your deadline")
+    create_at = models.DateTimeField(auto_now_add=True, help_text='Created time')
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='active',
+        help_text="status of task"
+    )
 
 
 class Chat(models.Model):

@@ -5,9 +5,13 @@ from .models import CustomUser, ExecutorPortfolio, Category, Task
 admin.site.register(CustomUser)
 
 admin.site.register(Category)
-admin.site.register(Task)
+
+
+@admin.register(Task)
+class Task(admin.ModelAdmin):
+    list_display = ['title', 'create_at']
 
 
 @admin.register(ExecutorPortfolio)
 class Profile(admin.ModelAdmin):
-    list_display = ['user', 'rating']
+    list_display = ['user', 'completed_tasks']

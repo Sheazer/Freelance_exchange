@@ -1,0 +1,14 @@
+{% extends "mysite/base.html" %}
+
+{% block title %}Edit profile {% endblock %}
+
+{% block content %}
+{% if error %}
+<h2 style="color: red;"><strong>{{error}}</strong></h2>
+{% endif %}
+<form action="{% url 'mysite:edit_portfolio' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" >SEND</button>
+</form>
+{% endblock %}

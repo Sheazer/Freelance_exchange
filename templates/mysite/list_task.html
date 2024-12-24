@@ -5,14 +5,32 @@
 
 {% block content %}
 
-<h1>list of tasks</h1>
-{% for task in tasks %}
-<a href="{% url 'mysite:detail_task' task.id %}"><h2>{{ task.title }}</h2></a>
-<p>{{ task.description }}</p>
-<p>{{ task.price }}</p>
-<p>{{ task.deadline }}</p>
-<p>----------------------</p>
- {% empty %}
-        <p>У вас пока нет задач.</p>
-{% endfor %}
+
+<div class="container my-5">
+    <h1 class="mb-4">Ваши проекты</h1>
+
+    {% if tasks %}
+    <div class="list-group">
+        {% for project in tasks %}
+        <a href="{% url 'mysite:detail_task' project.id %}" class="list-group-item list-group-item-action">
+            <h5 class="mb-1">{{ project.title }}</h5>
+            <p class="mb-1 text-muted">{{ project.description|truncatechars:100 }}</p>
+            <small>Создан: {{ project.create_at|date:"d.m.Y H:i" }}</small>
+            {% if project.status == 'active' %}
+            <p class="bg-success text-white p-2 rounded d-inline-block">Активный</p>
+            {% elif project.status == 'inactive' %}
+            <p class="bg-danger text-white p-2 rounded d-inline-block">Неактивный</p>
+            {% elif project.status == 'in_progress' %}
+            <p class="bg-warning text-white p-2 rounded d-inline-block">В работе</p>
+            {% elif project.status == 'completed' %}
+            <p class="bg-primary text-white p-2 rounded d-inline-block">Завершен</p>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">У вас пока нет созданных проектов.</p>
+    {% endif %}
+</div>
+
 {% endblock %}

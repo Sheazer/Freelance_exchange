@@ -4,17 +4,23 @@
 
 
 {% block content %}
+    <div class="border-bottom pb-3 mb-3">
+        <h1>Задача: {{ task.title }}</h1>
+        <p><strong>Описание:</strong> {{ task.description }}</p>
+        <p><strong>Цена:</strong> {{ task.price }}</p>
+        <p><strong>Срок выполнения:</strong> {{ task.deadline }}</p>
 
-<p>----------------------</p>
-<h1>Task</h1>
-<h2>{{ task.title }}</h2>
-<p>{{ task.description }}</p>
-<p>{{ task.price }}</p>
-<p>{{ task.deadline }}</p>
-<p>{{ task.key_words }}</p>
-<p>{{ task.price }}</p>
-{% if task.categories %}
-    <p>{{ task.categories }}</p>
-{% endif %}
-<p>----------------------</p>
+        {% if task.key_words %}
+            <p><strong>Ключевые слова:</strong> {{ task.key_words }}</p>
+        {% endif %}
+
+        {% if task.categories.all %}
+            <p><strong>Категории:</strong>
+                {% for  category in task.categories.all %}
+                {{ category.name }}
+                {% endfor %}
+            </p>
+        {% endif %}
+    </div>
 {% endblock %}
+

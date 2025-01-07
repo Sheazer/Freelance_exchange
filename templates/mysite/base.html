@@ -36,12 +36,12 @@
 <body>
 {% block header %}
 <!-- Header -->
-<header class="py-2" style="background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);">
+<header class="py-3" style="background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);">
     <div class="container">
         <nav class="navbar navbar-expand-lg p-0">
             <div class="container-fluid p-0">
                 <!-- Логотип -->
-                <a class="navbar-brand text-white fw-bold" href="/" style="font-size: 1.2rem;">Мой Сайт</a>
+                <a class="navbar-brand text-white fw-bold" href="/" style="font-size: 1.3rem;">Мой Сайт</a>
 
                 <!-- Навигационные ссылки -->
                 <div class="d-flex ms-auto align-items-center gap-3">
@@ -52,14 +52,13 @@
                                 id="customerDropdown"
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false"
-                                style="font-size: 0.9rem;">
+                                style="font-size: 1rem;">
                             Заказчику
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="customerDropdown">
                             <li><a class="dropdown-item" href="{% url 'mysite:freelancers' %}">Найти фрилансера</a></li>
                             <li><a class="dropdown-item" href="{% url 'mysite:create_task' %}">Создать задачу</a></li>
-                            <li><a class="dropdown-item" href="{% url 'mysite:list_task' %}">Управление проектами</a>
-                            </li>
+                            <li><a class="dropdown-item" href="{% url 'mysite:list_task' %}">Управление проектами</a></li>
                         </ul>
                     </div>
                     <div class="dropdown me-2">
@@ -69,7 +68,7 @@
                                 id="freelancerDropdown"
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false"
-                                style="font-size: 0.9rem;">
+                                style="font-size: 1rem;">
                             Фрилансеру
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="freelancerDropdown">
@@ -77,6 +76,11 @@
                         </ul>
                     </div>
                     {% if request.user.is_authenticated %}
+                    <!-- Ссылка на сообщения -->
+                    <a href="{% url 'mysite:dialog_list' %}" class="text-white text-decoration-none d-flex align-items-center gap-2" style="font-size: 1rem;">
+                        <i class="bi bi-chat-left-text"></i> Сообщения
+                    </a>
+
                     <div class="dropdown">
                         <a
                                 href="{% url 'mysite:profile' request.user.username %}"
@@ -95,19 +99,17 @@
                             </div>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                            <li><a class="dropdown-item" href="{% url 'mysite:profile' request.user.username %}">Моя
-                                страница</a></li>
+                            <li><a class="dropdown-item" href="{% url 'mysite:profile' request.user.username %}">Моя страница</a></li>
                             <li><a class="dropdown-item" href="{% url 'mysite:edit_profile' %}">Личные данные</a></li>
                             {% if request.user.role == 'executor' %}
-                            <li><a class="dropdown-item" href="{% url 'mysite:edit_portfolio' %}">Редактировать
-                                портфолио</a></li>
+                            <li><a class="dropdown-item" href="{% url 'mysite:edit_portfolio' %}">Редактировать портфолио</a></li>
                             {% endif %}
                             <li><a class="dropdown-item" href="{% url 'mysite:logout' %}">Выйти</a></li>
                         </ul>
                     </div>
                     {% else %}
                     <a class="text-white text-decoration-none d-flex align-items-center" href="/login"
-                       style="font-size: 0.9rem;">
+                       style="font-size: 1rem;">
                         Вход
                     </a>
                     {% endif %}
@@ -116,6 +118,7 @@
         </nav>
     </div>
 </header>
+
 
 {% endblock %}
 <!-- Main Content -->

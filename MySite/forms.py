@@ -1,5 +1,5 @@
 from django import forms
-from .models import CustomUser, Task, Category, ExecutorPortfolio
+from .models import CustomUser, Task, Category, ExecutorPortfolio, Comment, Message
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -37,7 +37,7 @@ class TaskCreateForm(forms.ModelForm):
 class UserEditForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['username', 'first_name', 'last_name', 'email' ]
+        fields = ['username', 'first_name', 'last_name', 'email']
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -59,5 +59,19 @@ class EditPortfolioForm(forms.ModelForm):
 
 
 class TaskFilterForm(forms.Form):
-    categories = forms.ModelMultipleChoiceField(queryset=Category.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
+    categories = forms.ModelMultipleChoiceField(queryset=Category.objects.all(), widget=forms.CheckboxSelectMultiple,
+                                                required=False)
     key_words = forms.CharField(max_length=100, required=False)
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content', 'offer']
+
+
+class MessageForm(forms.ModelForm):
+    content = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control form-control-sm', 'style': 'height: 50px;'}))
+    class Meta:
+        model = Message
+        fields = ['content']

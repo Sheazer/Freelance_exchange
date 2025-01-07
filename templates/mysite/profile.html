@@ -26,7 +26,12 @@
 </p>
 <p><strong>Скиллы:</strong>{{ profile.skills }}</p>
 <p><strong>Опыт работы:</strong>{{ profile.experience }}</p>
-<p><strong>Оценки:</strong>{{ profile.rating }}</p>
+<p>
+    <strong>Оценки:</strong>
+    <span class="text-success">{{ profile.like }}</span> /
+    <span class="text-danger">{{ profile.dislike }}</span>
+</p>
+<p><strong>Выполнено задач:</strong> {{ profile.completed_tasks }}</p>
 {% if request.user == user %}
 <a href="{% url 'mysite:edit_portfolio' %}" class="btn btn-primary">Редактировать</a>
 {% endif %}

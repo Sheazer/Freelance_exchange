@@ -79,11 +79,11 @@ class Task(models.Model):
 
 
 class Chat(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="chats", help_text="Chat for this task")
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="task_chats", help_text="Chat for this task")
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='customer_chats')
     executor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='executor_chats')
     created_date = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=False, help_text="Is the chat open?")
+    is_active = models.BooleanField(default=True, help_text="Is the chat open?")
 
     def __str__(self):
         return f"Chat with {self.customer}(customer) and {self.executor}(executor)"
@@ -103,8 +103,21 @@ class Message(models.Model):
         help_text="User who sent the message",
     )
     content = models.TextField(help_text="Message content")
-    timestamp = models.DateTimeField(help_text="Time when the message was send", default=now)
+    timestamp = models.DateTimeField(help_text="Time when the message was send", auto_now_add=True)
     is_read = models.BooleanField(default=False, help_text="Has the message been read?")
 
     def __str__(self):
         return f"Message from {self.sender.username} in chat {self.chat.id}"
+
+
+class Comment(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="comments")
+    executor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="comments")
+    content = models.CharField(max_length=200, help_text="type your text")
+    offer = models.IntegerField(default=0, help_text="Your proposal")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['task', 'executor'], name='unique_task_executor_comment')
+        ]

@@ -1,12 +1,14 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
+from django.http import HttpResponse
+from django.db.models import Q
 
-from .forms import UserRegistrationForm, TaskCreateForm, UserEditForm, EditPortfolioForm, TaskFilterForm
-from .models import CustomUser, Task, ExecutorPortfolio
+from .forms import UserRegistrationForm, TaskCreateForm, UserEditForm, EditPortfolioForm, TaskFilterForm, CommentForm, MessageForm
+from .models import CustomUser, Task, ExecutorPortfolio, Comment, Chat, Message
 from .decorators import role_required, anonymous_required
 
 
@@ -72,9 +74,59 @@ def list_task(request):
 
 
 @login_required
-def task_detail_view(request, pk):
+def task_detail_view(request, pk, executor_id=None):
     task = get_object_or_404(Task, pk=pk)
-    return render(request, 'mysite/detail_task.html', {'task': task})
+    comments = task.comments.all()
+
+    if task.status == 'active':
+        if request.method == 'POST':
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.task = task
+                comment.executor = request.user
+                comment.save()
+                return redirect('mysite:detail_task', pk=pk)
+            else:
+                form = CommentForm()
+            return render(request, 'mysite/detail_task.html', {'task': task, 'comments': comments, 'form': form,
+                                                               'error': 'Wrong comment'})
+        if request.user.is_executor():
+            if comments.filter(executor=request.user).exists():
+                return render(request, 'mysite/detail_task.html', {'task': task, 'comments': comments})
+            else:
+                form = CommentForm()
+                return render(request, 'mysite/detail_task.html', {'task': task, 'comments': comments,
+                                                                   'form': form})
+        return render(request, 'mysite/detail_task.html', {'task': task, 'comments': comments})
+    else:
+        return render(request, 'mysite/detail_task.html', {'task': task})
+
+
+@login_required
+def processing_task(request):
+    task_id = request.POST.get('task_id')
+    executor_id = request.POST.get('executor_id')
+
+    task = Task.objects.get(id=task_id)
+    executor = CustomUser.objects.get(id=executor_id)
+
+    if request.user != task.customer:
+        return HttpResponse('Вы не можете выбрать исполнителя для этой задачи.', status=403)
+
+    if task.status == 'active':
+        task.executor = executor
+        task.status = 'in_progress'
+        chat = Chat(customer=task.customer, executor=task.executor, task=task)
+        chat.save()
+        task.save()
+    elif task.status == 'in_progress':
+        task.status = 'completed'
+        task.executor.executor_portfolio.completed_tasks += 1
+        task.executor.executor_portfolio.save()
+        task.save()
+
+    return redirect('mysite:detail_task', pk=task_id)
 
 
 @login_required
@@ -148,3 +200,30 @@ def search_task(request):
             tasks = tasks.filter(key_words__icontains=key_words)
 
     return render(request, 'mysite/search_task.html', {'form': form, 'tasks': tasks})
+
+
+@login_required
+def dialog_list(request):
+    chats = Chat.objects.filter(Q(customer=request.user) | Q(executor=request.user))[:20]
+    if request.user.role == 'executor':
+        role = 'executor'
+    else:
+        role = 'customer'
+    return render(request, 'mysite/dialog_list.html', {'chats': chats, 'role': role})
+
+
+@login_required
+def dialog_view(request, chat_id):
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.user
+            message.chat = get_object_or_404(Chat,pk=chat_id)
+            message.save()
+    messages = Message.objects.filter(chat=chat_id).order_by('timestamp')[:20]
+    form = MessageForm()
+    return render(request, 'mysite/dialog_view.html', {'messages': messages, 'form': form, 'id': chat_id})
+
+
+

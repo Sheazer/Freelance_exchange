@@ -2,25 +2,83 @@
 
 {% block title %}Список заданий{% endblock %}
 
-
 {% block content %}
-    <div class="border-bottom pb-3 mb-3">
-        <h1>Задача: {{ task.title }}</h1>
-        <p><strong>Описание:</strong> {{ task.description }}</p>
-        <p><strong>Цена:</strong> {{ task.price }}</p>
-        <p><strong>Срок выполнения:</strong> {{ task.deadline }}</p>
+<div class="border-bottom pb-3 mb-3">
+    <h1 class="mb-3">Задача: {{ task.title }}</h1>
+    <p><strong>Описание:</strong> {{ task.description }}</p>
+    <p><strong>Цена:</strong> {{ task.price }}</p>
+    <p><strong>Срок выполнения:</strong> {{ task.deadline }}</p>
 
-        {% if task.key_words %}
-            <p><strong>Ключевые слова:</strong> {{ task.key_words }}</p>
-        {% endif %}
+    {% if task.key_words %}
+    <p><strong>Ключевые слова:</strong> {{ task.key_words }}</p>
+    {% endif %}
 
-        {% if task.categories.all %}
-            <p><strong>Категории:</strong>
-                {% for  category in task.categories.all %}
-                {{ category.name }}
-                {% endfor %}
-            </p>
+    {% if task.categories.all %}
+    <p><strong>Категории:</strong>
+        {% for category in task.categories.all %}
+        <span class="badge bg-primary">{{ category.name }}</span>
+        {% endfor %}
+    </p>
+    {% endif %}
+
+    {% if task.status == 'active' %}
+    <p class="bg-success text-white p-2 rounded d-inline-block">Активный</p>
+    {% elif task.status == 'inactive' %}
+    <p class="bg-danger text-white p-2 rounded d-inline-block">Неактивный</p>
+    {% elif task.status == 'in_progress' %}
+    <p class="bg-warning text-white p-2 rounded d-inline-block">В работе</p>
+    {% elif task.status == 'completed' %}
+    <p class="bg-primary text-white p-2 rounded d-inline-block">Завершен</p>
+    {% endif %}
+
+
+    {% if request.user == task.customer %}
+    {% if task.status == 'in_progress' %}
+    <a href="{% url 'mysite:dialog_view' task.task_chats.first.id %}" style="color: black">К диалогу</a>
+    <form action="{% url 'mysite:processing_task' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="task_id" value="{{ task.id }}">
+        <input type="hidden" name="executor_id" value="{{ task.executor.id }}">
+        <button type="submit">Завершить</button>
+    </form>
+    {% endif %}
+    {% endif %}
+
+</div>
+
+<div class="mt-4">
+    <h2>Комментарии</h2>
+    {% for comment in comments %}
+    <div class="border rounded p-3 mb-3">
+        <h3>
+            <a class="text-decoration-none text-primary" href="{% url 'mysite:profile' comment.executor.username %}">
+                {{ comment.executor.username }}
+            </a>
+        </h3>
+        <p class="mb-2">{{ comment.content }}</p>
+        <p><strong>Предложение:</strong> {{ comment.offer }}</p>
+        {% if request.user == task.customer %}
+        <form method="POST" action="{% url 'mysite:processing_task' %}">
+            {% csrf_token %}
+            <input type="hidden" name="task_id" value="{{ task.id }}">
+            <input type="hidden" name="executor_id" value="{{ comment.executor.id }}">
+            <button type="submit" class="btn btn-success">Выбрать</button>
+        </form>
         {% endif %}
     </div>
-{% endblock %}
+    {% empty %}
+    <p class="text-muted">Нет комментариев для этой задачи.</p>
+    {% endfor %}
+</div>
 
+<div class="mt-4">
+    {% if form %}
+    <h2>Оставить комментарий</h2>
+    <form method="post" class="border rounded p-4">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Отправить</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

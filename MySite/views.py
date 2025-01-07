@@ -7,7 +7,8 @@ from django.contrib.auth.views import LoginView
 from django.http import HttpResponse
 from django.db.models import Q
 
-from .forms import UserRegistrationForm, TaskCreateForm, UserEditForm, EditPortfolioForm, TaskFilterForm, CommentForm, MessageForm
+from .forms import UserRegistrationForm, TaskCreateForm, UserEditForm, EditPortfolioForm, TaskFilterForm, CommentForm, \
+    MessageForm
 from .models import CustomUser, Task, ExecutorPortfolio, Comment, Chat, Message
 from .decorators import role_required, anonymous_required
 
@@ -17,12 +18,14 @@ class UserLoginView(LoginView):
     template_name = "mysite/login.html"
 
 
+# Представление выхода с аккаунта
 def logout_view(request):
     logout(request)
     return redirect('mysite:login')
 
 
-@anonymous_required
+# Регистрация нового пользователя
+@anonymous_required  # декоратор где ограничивает залогиненых юзеров
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -39,12 +42,15 @@ def register(request):
         return render(request, 'mysite/register.html', {'form': form})
 
 
+# обычный View для главной страницы
 def home(request):
     users = CustomUser.objects.all()
     user = request.user
     return render(request, 'mysite/home.html', {'users': users, 'user': user})
 
 
+# Представление создания нового задания
+# Ограничения декораторов: залогоненый и только с ролью customer
 @login_required
 @role_required('customer')
 def create_task(request):
@@ -66,6 +72,7 @@ def create_task(request):
         return render(request, 'mysite/create_task.html', {'form': form})
 
 
+# Просмотр своих существуещих обьявлений customer
 @login_required
 @role_required('customer')
 def list_task(request):
@@ -73,6 +80,7 @@ def list_task(request):
     return render(request, 'mysite/list_task.html', {'tasks': tasks})
 
 
+# Просмотр более детального просмотра одного Task
 @login_required
 def task_detail_view(request, pk, executor_id=None):
     task = get_object_or_404(Task, pk=pk)
@@ -103,6 +111,7 @@ def task_detail_view(request, pk, executor_id=None):
         return render(request, 'mysite/detail_task.html', {'task': task})
 
 
+# Нужен для того чтобы поменять статус тасков. Например если в процессе работы завершить
 @login_required
 def processing_task(request):
     task_id = request.POST.get('task_id')
@@ -129,6 +138,7 @@ def processing_task(request):
     return redirect('mysite:detail_task', pk=task_id)
 
 
+# Представление для редакции профиля
 @login_required
 def edit_profile(request):
     user = request.user
@@ -145,6 +155,7 @@ def edit_profile(request):
         return render(request, 'mysite/edit_profile.html', {'form': form})
 
 
+# Просмотр профиля любого
 def user_profile(request, username):
     user = get_object_or_404(CustomUser, username=username)
     executor_profile = None
@@ -155,11 +166,13 @@ def user_profile(request, username):
     return render(request, 'mysite/profile.html', {'user': user, 'profile': executor_profile})
 
 
+# Вывод списка фрилансеров
 def freelancers_list(request):
     executors = CustomUser.objects.filter(role='executor')
     return render(request, 'mysite/freelancers.html', {'users': executors})
 
 
+# Редактировать портофолио для Исполнителя и только
 @login_required
 @role_required('executor')
 def edit_portfolio(request):
@@ -185,6 +198,7 @@ def edit_portfolio(request):
         return render(request, 'mysite/edit_portfolio.html', {'form': form})
 
 
+# Страница поиска любого задания на сайте
 @login_required
 def search_task(request):
     form = TaskFilterForm(request.GET)
@@ -202,6 +216,7 @@ def search_task(request):
     return render(request, 'mysite/search_task.html', {'form': form, 'tasks': tasks})
 
 
+# Выводим список переписок пользователя
 @login_required
 def dialog_list(request):
     chats = Chat.objects.filter(Q(customer=request.user) | Q(executor=request.user))[:20]
@@ -212,6 +227,7 @@ def dialog_list(request):
     return render(request, 'mysite/dialog_list.html', {'chats': chats, 'role': role})
 
 
+# Крутая функция, горд собой! Выводит чат с связанным собеседником
 @login_required
 def dialog_view(request, chat_id):
     if request.method == 'POST':
@@ -219,11 +235,8 @@ def dialog_view(request, chat_id):
         if form.is_valid():
             message = form.save(commit=False)
             message.sender = request.user
-            message.chat = get_object_or_404(Chat,pk=chat_id)
+            message.chat = get_object_or_404(Chat, pk=chat_id)
             message.save()
     messages = Message.objects.filter(chat=chat_id).order_by('timestamp')[:20]
     form = MessageForm()
     return render(request, 'mysite/dialog_view.html', {'messages': messages, 'form': form, 'id': chat_id})
-
-
-

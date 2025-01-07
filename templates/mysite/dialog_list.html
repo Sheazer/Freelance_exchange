@@ -1,0 +1,59 @@
+{% extends "mysite/base.html" %}
+{% load static %}
+
+{% block title %}Dialog List{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Dialog List</h1>
+    <div class="row">
+        {% if role == 'executor' %}
+        {% for chat in chats %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body d-flex align-items-center">
+                    <img src="{% static 'images/avatar.png' %}" class="rounded-circle me-3" alt="Avatar" width="50"
+                         height="50">
+                    <div>
+                        <a href="{% url 'mysite:dialog_view' chat.id %}">
+                            <p class="mb-0 fw-bold text-dark bg-light p-2 rounded"
+                               style="box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);">{{ chat.executor.first_name }}
+                                {{ chat.executor.last_name }}</p>
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <h2 class="text-muted">Пока диалогов нету</h2>
+        </div>
+        {% endfor %}
+        {% else %}
+        {% for chat in chats %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body d-flex align-items-center">
+                    <img src="{% static 'images/avatar.png' %}" class="rounded-circle me-3" alt="Avatar" width="50"
+                         height="50">
+                    <div>
+                        <a href="{% url 'mysite:dialog_view' chat.id %}">
+                            <p class="mb-0 fw-bold text-dark bg-light p-2 rounded"
+                               style="box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);">{{ chat.executor.first_name }}
+                                {{ chat.executor.last_name }}</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <h2 class="text-muted">Пока диалогов нету</h2>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

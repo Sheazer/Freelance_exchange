@@ -50,7 +50,7 @@ def home(request):
 
 
 # Представление создания нового задания
-# Ограничения декораторов: залогоненый и только с ролью customer
+# Ограничения декораторов: залогиненых и только с ролью customer
 @login_required
 @role_required('customer')
 def create_task(request):

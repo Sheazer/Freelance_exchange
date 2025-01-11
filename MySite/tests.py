@@ -18,4 +18,3 @@ class TaskModelTest(TestCase):
         self.assertEqual(Task.objects.count(), 1)
 
 
-class
